@@ -198,7 +198,55 @@ async function run() {
             res.send(result);
         });
 
-        
+        // ************** Categories section ***************//
+        // Create/Insert section
+        app.post('/categories', async (req, res) => {
+            const newCategory = req.body;
+            const result = await categoriesCollections.insertOne(newCategory);
+            res.send(result);
+        });
+
+        // Get all categories
+        app.get('/categories', async (req, res) => {
+            const cursor = categoriesCollections.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Get single category
+        app.get('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await categoriesCollections.findOne(query);
+            res.send(result);
+        });
+        // Delete category
+        app.delete('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await categoriesCollections.deleteOne(query);
+            res.send(result);
+        });
+
+        // Update category
+        app.put('/categories/:id', async (req, res) => {
+            const id = req.params.id;
+            const category = req.body;
+            const { categoryName, status } = category;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedCategory = {
+                $set: {
+                    categoryName,
+                    status
+                },
+            };
+            const result = await categoriesCollections.updateOne(filter, updatedCategory, options);
+            res.send(result);
+        });
+
+
 
 
         // Send a ping to confirm a successful connection
