@@ -38,8 +38,7 @@ async function run() {
 
 
 
-        // Users Data Section
-
+        //*********************** Users Data Section********************/
         // Create/Insert section
         app.post('/users', async (req, res) => {
             const newUser = req.body;
@@ -76,12 +75,10 @@ async function run() {
         app.put('/users/:id', async (req, res) => {
             const id = req.params.id;
             const user = req.body;
-            const {name, email, phone, password, gender, country, status, about} = user;
+            const { name, email, phone, password, gender, country, status, about } = user;
 
             const filter = { _id: new ObjectId(id) };
             const options = { upsert: true };
-
-            // Specify the update to set a value for the plot field
             const updatedUser = {
                 $set: {
                     name,
@@ -94,11 +91,57 @@ async function run() {
                     about
                 },
             };
-            // Update the first document that matches the filter
             const result = await usersCollections.updateOne(filter, updatedUser, options);
             res.send(result);
-        })
+        });
 
+        // ************** Groups section ***************//
+        // Create/Insert section
+        app.post('/groups', async (req, res) => {
+            const newGroup = req.body;
+            const result = await groupsCollections.insertOne(newGroup);
+            res.send(result);
+        });
+
+        // Get all groups
+        app.get('/groups', async (req, res) => {
+            const cursor = groupsCollections.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Get single group
+        app.get('/groups/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await groupsCollections.findOne(query);
+            res.send(result);
+        });
+        // Delete group
+        app.delete('/groups/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await groupsCollections.deleteOne(query);
+            res.send(result);
+        });
+
+        // Update group
+        app.put('/groups/:id', async (req, res) => {
+            const id = req.params.id;
+            const group = req.body;
+            const { groupName, status } = group;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedGroup = {
+                $set: {
+                    groupName,
+                    status
+                },
+            };
+            const result = await groupsCollections.updateOne(filter, updatedGroup, options);
+            res.send(result);
+        });
 
 
         // Send a ping to confirm a successful connection
