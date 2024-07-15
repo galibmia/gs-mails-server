@@ -142,6 +142,63 @@ async function run() {
             const result = await groupsCollections.updateOne(filter, updatedGroup, options);
             res.send(result);
         });
+        //*********************** Contacts Data Section********************/
+        // Create/Insert section
+        app.post('/contacts', async (req, res) => {
+            const newContact = req.body;
+            const result = await contactsCollections.insertOne(newContact);
+            res.send(result);
+
+        });
+
+        // Get all contacts
+        app.get('/contacts', async (req, res) => {
+            const cursor = contactsCollections.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Get single Contact
+        app.get('/contacts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await contactsCollections.findOne(query);
+            res.send(result);
+        });
+
+        // Delete Contact
+        app.delete('/contacts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await contactsCollections.deleteOne(query);
+            res.send(result);
+        });
+
+        // Update Contact:
+        app.put('/contacts/:id', async (req, res) => {
+            const id = req.params.id;
+            const contact = req.body;
+            const { name, email, phone, gender, country, group, status, about } = contact;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedContact = {
+                $set: {
+                    name,
+                    email,
+                    phone,
+                    gender,
+                    country,
+                    group,
+                    status,
+                    about
+                },
+            };
+            const result = await contactsCollections.updateOne(filter, updatedContact, options);
+            res.send(result);
+        });
+
+        
 
 
         // Send a ping to confirm a successful connection
