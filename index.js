@@ -40,7 +40,7 @@ async function run() {
 
         // Users Data Section
 
-        // Create section
+        // Create/Insert section
         app.post('/users', async (req, res) => {
             const newUser = req.body;
             const result = await usersCollections.insertOne(newUser);
@@ -49,27 +49,55 @@ async function run() {
         });
 
         // Get all users
-        app.get('/users', async(req, res) => {
+        app.get('/users', async (req, res) => {
             const cursor = usersCollections.find();
             const result = await cursor.toArray();
             res.send(result);
         });
 
         // Get single user
-        app.get('/users/:id', async(req, res) => {
+        app.get('/users/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await usersCollections.findOne(query);
             res.send(result);
         });
-        // Update user
-        app.delete('/users/:id', async(req, res) => {
+
+        // Delete user
+        app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await usersCollections.deleteOne(query);
             res.send(result);
-        })
+        });
 
+
+        // Update User:
+        app.put('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const user = req.body;
+            const {name, email, phone, password, gender, country, status, about} = user;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+
+            // Specify the update to set a value for the plot field
+            const updatedUser = {
+                $set: {
+                    name,
+                    email,
+                    phone,
+                    password,
+                    gender,
+                    country,
+                    status,
+                    about
+                },
+            };
+            // Update the first document that matches the filter
+            const result = await usersCollections.updateOne(filter, updatedUser, options);
+            res.send(result);
+        })
 
 
 
