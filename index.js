@@ -35,6 +35,7 @@ async function run() {
         const contactsCollections = database.collection("contacts_DB");
         const categoriesCollections = database.collection("categories_DB");
         const templatesCollections = database.collection("templates_DB");
+        const campaignsCollections = database.collection("campaigns_DB");
 
 
 
@@ -243,6 +244,59 @@ async function run() {
                 },
             };
             const result = await categoriesCollections.updateOne(filter, updatedCategory, options);
+            res.send(result);
+        });
+
+
+        //*********************** Templates Data Section********************/
+        // Create/Insert section
+        app.post('/templates', async (req, res) => {
+            const newTemplate = req.body;
+            const result = await templatesCollections.insertOne(newTemplate);
+            res.send(result);
+
+        });
+
+        // Get all templates
+        app.get('/templates', async (req, res) => {
+            const cursor = templatesCollections.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Get single templates
+        app.get('/templates/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await templatesCollections.findOne(query);
+            res.send(result);
+        });
+
+        // Delete templates
+        app.delete('/templates/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await templatesCollections.deleteOne(query);
+            res.send(result);
+        });
+
+        // Update templates:
+        app.put('/templates/:id', async (req, res) => {
+            const id = req.params.id;
+            const template = req.body;
+            const { subject, body, category, status } = template;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedTemplate = {
+                $set: {
+                    subject,
+                    body,
+                    category,
+                    status
+                },
+            };
+            const result = await templatesCollections.updateOne(filter, updatedTemplate, options);
             res.send(result);
         });
 
