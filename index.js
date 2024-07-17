@@ -300,6 +300,60 @@ async function run() {
             res.send(result);
         });
 
+        //*********************** Campaigns Data Section********************/
+        // Create/Insert section
+        app.post('/campaigns', async (req, res) => {
+            const newCampaign = req.body;
+            const result = await campaignsCollections.insertOne(newCampaign);
+            res.send(result);
+
+        });
+
+        // Get all campaigns
+        app.get('/campaigns', async (req, res) => {
+            const cursor = campaignsCollections.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // Get single campaigns
+        app.get('/campaigns/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await campaignsCollections.findOne(query);
+            res.send(result);
+        });
+
+        // Delete campaigns
+        app.delete('/campaigns/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await campaignsCollections.deleteOne(query);
+            res.send(result);
+        });
+
+        // Update campaigns:
+        app.put('/campaigns/:id', async (req, res) => {
+            const id = req.params.id;
+            const campaign = req.body;
+            const { name, groupName, template, sendingDate, time, status } = campaign;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedCampaign = {
+                $set: {
+                    name,
+                    groupName,
+                    template,
+                    sendingDate,
+                    time,
+                    status
+                },
+            };
+            const result = await campaignsCollections.updateOne(filter, updatedCampaign, options);
+            res.send(result);
+        });
+
 
 
 
